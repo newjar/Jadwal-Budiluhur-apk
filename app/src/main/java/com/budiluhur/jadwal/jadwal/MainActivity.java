@@ -2,6 +2,7 @@ package com.budiluhur.jadwal.jadwal;
 
 import android.content.Intent;
 import android.net.Uri;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -12,11 +13,12 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ProgressBar;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener {
 
-    ProgressBar progressBar;
-
-    WebView webView;
+    private ProgressBar progressBar;
+    private WebView webView;
+    private SwipeRefreshLayout swipe;
+    private String currentURL = "http://jadwal.budiluhur.ac.id/";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,8 +26,9 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
-
         webView = (WebView) findViewById(R.id.webView);
+        swipe   = (SwipeRefreshLayout) findViewById(R.id.swipe);
+        swipe.setOnRefreshListener(this);
 
         if(savedInstanceState != null) {
             webView.restoreState(savedInstanceState);
@@ -76,8 +79,19 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void onPageFinished(WebView view, String url) {
+            swipe.setRefreshing(false);
             super.onPageFinished(view, url);
         }
+
+    }
+
+    @Override
+    public void onRefresh() {
+        swipe.setRefreshing(true);
+        ReLoadWebView(currentURL);
+    }
+    private void ReLoadWebView(String currentURL) {
+        webView.loadUrl(currentURL);
     }
 
     @Override
